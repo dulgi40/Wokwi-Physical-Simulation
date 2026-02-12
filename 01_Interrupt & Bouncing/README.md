@@ -5,11 +5,22 @@
 🚀 1. 背景と目的
 組み込みシステムの基礎である割込み方式を習得するため、LED制御 + プッシュボタンISR システムを構築しました。実習の際、Wokwiシミュレータのボタン属性にある「Bounce」というオプションを発見し、「単なるボタン操作になぜ別個の属性が存在するのか」という疑問をきっかけに、その原理を深く学習することにしました。
 
+![01  Interrupt Example](https://github.com/user-attachments/assets/bd545989-dc34-4047-97d7-7559ca210562)
+▲ 割込み方式を活用した基本的なLED制御システムの動作確認。
+
+
+<img width="956" height="444" alt="02  Bounce Hakken" src="https://github.com/user-attachments/assets/e1817122-b782-4bc5-8d2d-3bbc6775f591" />
+▲ Wokwi上で発見した「Bounce」オプション。これが学習のきっかけとなった。
+
 
 🔍 2. 課題
 問題の把握: 「Bounce」オプションを有効にすると、ボタンを一度押しただけなのに割込みカウントが数十回も上昇する現象を確認しました。
 
 原因の調査: これは機械的接点が触れ合う瞬間に発生する物理的な振動、「チャタリング(Chattering)」現象が原因であることを把握しました。非常に敏感な割込み処理が、この微細な振動をすべて独立した信号として認識し、ISRを重複実行してしまうことが問題の核心でした。
+
+
+![03  Whatisbounce](https://github.com/user-attachments/assets/dcfef40e-35b3-4ff6-b83b-313542df1b1c)
+▲ バウンス有効時、チャタリングによりカウントが異常に急増する現象の再現。
 
 🛠 3. 解決策と実装
 解決方法: millis() 関数を利用したソフトウェア的デバウンス(Software Debouncing)処理。
@@ -18,15 +29,14 @@
 
 結果: ノイズが激しい環境でも、たった一度のクリーンなクリック信号のみを検出することに成功しました。
 
+
+![04  Whatisbounce2](https://github.com/user-attachments/assets/52dc8941-d6a7-4cd1-bb8c-14c60e387a0d)
+▲ ソフトウェア・デバウンス適用後、ノイズを除去して正確に1回ずつカウントされる様子。
+
 💡 4. 考察
 ハードウェア的な代替案: コストやスペースに余裕がある場合、RCフィルタ(抵抗とコンデンサ)やシュミットトリガ回路を構成することで、MCUに信号が届く前に物理的にノイズを除去(じょきょ)できることを学びました。これはCPUリソースを節約できる最も確実な方法です。
 
 delay() 使用の注意点: 割込みシステムにおいて delay() のようなブロッキング関数は、システムの応答性を低下させ、割込みの即時性を妨げる(さまたげる)可能性があるため、millis() ベースの非同期処理が必須であることを体感しました。
 
 
-![01  Interrupt Example](https://github.com/user-attachments/assets/bd545989-dc34-4047-97d7-7559ca210562)
 
-<img width="956" height="444" alt="02  Bounce Hakken" src="https://github.com/user-attachments/assets/e1817122-b782-4bc5-8d2d-3bbc6775f591" />
-
-![03  Whatisbounce](https://github.com/user-attachments/assets/dcfef40e-35b3-4ff6-b83b-313542df1b1c)
-![04  Whatisbounce2](https://github.com/user-attachments/assets/52dc8941-d6a7-4cd1-bb8c-14c60e387a0d)
