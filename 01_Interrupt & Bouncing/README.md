@@ -22,3 +22,11 @@
 ハードウェア的な代替案: コストやスペースに余裕がある場合、RCフィルタ(抵抗とコンデンサ)やシュミットトリガ回路を構成することで、MCUに信号が届く前に物理的にノイズを除去(じょきょ)できることを学びました。これはCPUリソースを節約できる最も確実な方法です。
 
 delay() 使用の注意点: 割込みシステムにおいて delay() のようなブロッキング関数は、システムの応答性を低下させ、割込みの即時性を妨げる(さまたげる)可能性があるため、millis() ベースの非同期処理が必須であることを体感しました。
+
+
+![01  Interrupt Example](https://github.com/user-attachments/assets/bd545989-dc34-4047-97d7-7559ca210562)
+
+<img width="956" height="444" alt="02  Bounce Hakken" src="https://github.com/user-attachments/assets/e1817122-b782-4bc5-8d2d-3bbc6775f591" />
+
+![03  Whatisbounce](https://github.com/user-attachments/assets/dcfef40e-35b3-4ff6-b83b-313542df1b1c)
+![04  Whatisbounce2](https://github.com/user-attachments/assets/52dc8941-d6a7-4cd1-bb8c-14c60e387a0d)
