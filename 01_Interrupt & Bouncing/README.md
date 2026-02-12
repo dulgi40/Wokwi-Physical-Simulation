@@ -15,6 +15,8 @@
 ▲ Wokwi上で発見した「Bounce」オプション。これが学習のきっかけとなった。
 
 
+
+
 🔍 2. 課題
 問題の把握: 「Bounce」オプションを有効にすると、ボタンを一度押しただけなのに割込みカウントが数十回も上昇する現象を確認しました。
 
@@ -22,6 +24,7 @@
 
 
 ![03  Whatisbounce](https://github.com/user-attachments/assets/dcfef40e-35b3-4ff6-b83b-313542df1b1c)
+
 ▲ バウンス有効時、チャタリングによりカウントが異常に急増する現象の再現。
 
 🛠 3. 解決策と実装
@@ -33,6 +36,7 @@
 
 
 ![04  Whatisbounce2](https://github.com/user-attachments/assets/52dc8941-d6a7-4cd1-bb8c-14c60e387a0d)
+
 ▲ ソフトウェア・デバウンス適用後、ノイズを除去して正確に1回ずつカウントされる様子。
 
 💡 4. 考察
