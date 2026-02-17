@@ -1,0 +1,93 @@
+{
+  "version": 1,
+  "author": "신튼",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+    {
+      "type": "wokwi-led",
+      "id": "led1",
+      "top": 188.4,
+      "left": 205.4,
+      "attrs": { "color": "red" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn1",
+      "top": 63.8,
+      "left": -76.8,
+      "attrs": { "color": "red", "xray": "1", "bounce": "0" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn2",
+      "top": 236.6,
+      "left": 19.2,
+      "attrs": { "color": "blue", "xray": "1", "bounce": "0" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn3",
+      "top": 131,
+      "left": -76.8,
+      "attrs": { "color": "green", "xray": "1", "bounce": "0" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led2",
+      "top": 15.6,
+      "left": 195.8,
+      "attrs": { "color": "green" }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "text1",
+      "top": 0,
+      "left": 172.8,
+      "attrs": { "text": "IDLE STATUS LED" }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "text2",
+      "top": 240,
+      "left": 230.4,
+      "attrs": { "text": "PWM LED (ONLY IN RUN STATUS)" }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "text3",
+      "top": 288,
+      "left": -9.6,
+      "attrs": { "text": "MENU BUTTON" }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "text4",
+      "top": 182.4,
+      "left": -124.8,
+      "attrs": { "text": "RUN BUTTON" }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "text5",
+      "top": 28.8,
+      "left": -124.8,
+      "attrs": { "text": "RESET BUTTON" }
+    }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "led1:A", "esp:2", "green", [ "v0" ] ],
+    [ "led1:C", "esp:GND.3", "green", [ "v0" ] ],
+    [ "btn1:2.r", "btn3:2.r", "green", [ "h0" ] ],
+    [ "btn3:2.r", "esp:GND.1", "green", [ "h0" ] ],
+    [ "btn3:1.l", "esp:12", "green", [ "h0" ] ],
+    [ "btn1:1.l", "esp:14", "green", [ "h0" ] ],
+    [ "btn2:2.r", "led1:C", "green", [ "h0" ] ],
+    [ "esp:15", "btn2:1.l", "green", [ "v76.8", "h-81.56" ] ],
+    [ "led2:A", "esp:4", "green", [ "v0" ] ],
+    [ "led2:C", "led1:C", "green", [ "v0" ] ]
+  ],
+  "dependencies": {}
+}
