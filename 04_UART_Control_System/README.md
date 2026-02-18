@@ -65,7 +65,7 @@ PWM理論の学習を目的としているため、
 ## ▶️ 5. 動作確認
 
 
-![04](./04_UART_Control_System.gif)
+![04_UART_Control_System](./04_UART_Control_System.gif)
 
 - IDLE: IDLE LED ON / PWM LED OFF
 - RUN: PWM LED ON / IDLE LED OFF
