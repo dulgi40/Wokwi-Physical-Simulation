@@ -1,146 +1,81 @@
-#include <string.h> // for strcmp Function
-#include <stdlib.h> // for atoi Function
+# 📑 03_PWM_Control_with_FSM
 
-char rxBuf[32]; // Input Text By UART
-uint8_t rxLen = 0; // Input Text Index By UART
+## 📌 要約
+PWM理論の学習のため、Wokwiシミュレーションを用いてRUN状態のLEDをPWMで制御した。  
+デューティ値はそれぞれ10%、50%、90%の3段階で制御できるようにした。
 
+---
 
-// PWM Setting
-const int pwmValue[3] = {10, 50, 90};
-uint8_t pwmIndex = 0;
-const uint8_t pwmBit = 8;
-const uint8_t pwmIndexSize = sizeof(pwmValue)/sizeof(pwmValue[0]);
-int pwmMax = (1<<pwmBit) -1;
+## 🚀 1. 背景と目的
 
+組込み制御では、モーターやブザーなどの制御にPWM理論を応用し、  
+デバイスの動作を制御することができる。
 
-// Status Setting
-enum State : uint8_t {IDLE, RUN};
-State state = IDLE;
+PWM制御に必要な主な要素は、周波数とデューティ比である。  
+0と1で構成される周期的なスクエア波において、  
+1/周期が周波数となり、デューティは1の状態が占める時間の割合を意味する。
 
+本実習では以下を目的とした。
 
+- 産業制御のイメージを出すため、前の例と同様にFSM構造を採用した。
+- メニューボタンで変更できるデューティ比は10%、50%、90%の3段階とした。
+- 状態はIDLEとRUNの2つのみとした。
+- 産業制御の考え方として、IDLE状態ではメニューボタンを押しても動作せず、案内メッセージを出力するようにした。
+- 解像度は8bit（256段階）とした。
 
-void setup() {
-  Serial.begin(115200);
+---
 
-  // PWM Setup
-  ledcAttach(12, 5000, pwmBit);
+## 🔍 2. 課題 (Challenge)
 
+PWM理論の学習を目的としているため、  
+モーターやブザーは使用せず、LEDを用いて動作確認を行った。
 
-  Serial.println("UART Test System (if you don't know commands, type 'help')");
-}
+---
 
+## 🛠 3. 解決策と実装
 
-// UART Communication By Serial Text Input
-void handleLine(char* line){
+### ■ PWM設計
+- 10%、50%、90%の3段階デューティ比によるPWM制御
+- 解像度は8bit（256段階）
 
-  // Go to RUN
-  if (strcmp(line, "run") ==0){
-    if(state == IDLE){
-      state = RUN;
-      Serial.println("Now RUNNING");
-    }
-    else{
-      Serial.println("Already RUN");
-    }
-  }
-  
-  // Go to IDLE
-  else if (strcmp(line, "idle")==0){
-    if(state == RUN){
-      state = IDLE;
-      Serial.println("Now IDLE");
+### ■ FSM構造
 
-    }
-    else{
-      Serial.println("Already IDLE");
-    }
-  }
+**State**
+- IDLE
+- RUN
 
-  // Set Duty 
-  else if (strncmp(line, "duty ",5)==0){
-    int value = atoi(&line[5]);
-    bool found = false;
-    for (int i=0;i<pwmIndexSize;i++){
-      if(value==pwmValue[i]){
-        pwmIndex = i;
-        found = true;
-        Serial.print("Duty Set To "); Serial.print(value); Serial.println("%");
-        break;
-      }
-    }
-    if(found == false){
-      Serial.println("Doesn't Exist Value (must input 'duty 10/50/90')");
-    }
+**Event**
+- START
+- MENU BUTTON PRESS
+- RESET
 
-  }
+---
 
-  // Show Current Status
-  else if (strcmp(line, "status")==0){
-    if(state==IDLE){
-      Serial.println("Now IDLE");
-    }
-    else {Serial.println("Now RUNNING");}
-    Serial.print("Duty: "); Serial.print(pwmValue[pwmIndex]); Serial.println("%");
-  }
+## 📊 4. 状態遷移表
 
-  // Show Commands
-  else if (strcmp(line, "help")==0){
-    Serial.println("Available Commands:");
-    Serial.println(" run");
-    Serial.println(" idle");
-    Serial.println(" duty 10 / 50 / 90");
-    Serial.println(" status");
-  }
+| Current | Event   | Next  | 備考 |
+|----------|---------|-------|------|
+| IDLE     | START   | RUN   | IDLE表示LEDが消灯し、初期デューティ値からPWM制御開始 |
+| IDLE     | MENU BUTTON PRESS | 変化なし | デューティ変更は行われず、案内メッセージのみ出力 |
+| RUN      | MENU BUTTON PRESS | 変化なし | デューティ値が10→50→90の順で変更 |
+| RUN      | RESET   | IDLE  | IDLE状態へ復帰 |
 
-  // else : Unknown Command
-  else{
-    Serial.println("Unknown Command");
-  }
-}
+---
 
-void loop() {
+## ▶️ 5. 動作確認
 
-  // UART Communication
-  while (Serial.available()>0){
-    char c = Serial.read();
+![04](./04_UART_Control_System.gif)
 
+- IDLE: IDLE LED ON / PWM LED OFF
+- RUN: PWM LED ON / IDLE LED OFF
+- RESETによりIDLEへ復帰
 
-    // When Taking Enter
-    if (c=='\n'){
-      rxBuf[rxLen] = '\0';
-      handleLine(rxBuf);
-      rxLen = 0;
+---
 
-    }
+## 💡 6. 考察 (Insight)
 
-    // When Taking Another
-    else{
-      if(c=='\r') continue;
-
-      else if(rxLen < sizeof(rxBuf) -1){
-        rxBuf[rxLen] = c;
-        rxLen++;
-      }
-
-
-    }
-
-  }
-  
-  // In IDLE
-  if (state==IDLE){
-    ledcWrite(12, 0);
-  }
-
-
-  // In RUN
-  else if (state==RUN){
-    ledcWrite(12, pwmMax * pwmValue[pwmIndex] / 100);
-
-  }
-
-
-  delay(2); //
-}
-
+1. PWM制御では周波数、デューティ比、解像度の設定が重要である。
+2. モーター制御ではデューティ比、ブザー制御では周波数が重要なポイントとなる。
+3. 実際のPWM制御では可聴周波数を考慮し、周波数を10kHz以上に設定することが望ましい。
+4. PWMを応用できる他の用途についても今後調査していきたい。
 
